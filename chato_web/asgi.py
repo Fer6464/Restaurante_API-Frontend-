@@ -1,5 +1,5 @@
 """
-ASGI config for backend_data_server project.
+ASGI config for chato_web project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_data_server.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chato_web.settings')
 
 application = get_asgi_application()
