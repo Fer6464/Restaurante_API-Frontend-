@@ -35,6 +35,25 @@
             }
         }
     </script>
+
+    <script>
+        // Incrementa o decrementa el valor actual de un plato específico
+        function modificarNumero(idPlato, cantidad, maxStock) {
+            const input = document.getElementById('plato_' + idPlato);
+            if (!input) return;
+
+            let valorActual = parseInt(input.value, 10) || 0;
+            let nuevoValor = valorActual + cantidad;
+
+            // Validamos límites (mínimo 0 y máximo el stock disponible)
+            if (nuevoValor < 0) nuevoValor = 0;
+            if (maxStock !== undefined && maxStock > 0 && nuevoValor > maxStock) {
+                nuevoValor = maxStock;
+            }
+
+            input.value = nuevoValor;
+        }
+    </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,62 +144,67 @@
 
     <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
 
-        <!-- Botón de retorno UX -->
-        <a href="{% url 'sistema_restaurante:categorias' %}" class="inline-flex items-center gap-2 mb-6 px-4 py-2 text-sm font-semibold text-stone-600 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 hover:text-emerald-700 transition-colors shadow-sm">
-            <span>←</span> Volver a Categorías
-        </a>
+        <!-- Formulario que agrupa los botones y los inputs de los platos -->
+        <form method="post" action="{% url 'sistema_restaurante:agregar_platos_comanda' %}">
+            {% csrf_token %}
 
-        {% if platos_categoria %}
-            <div class="space-y-16">
+            <!-- Barra superior: Botón de Retorno + Botón Agregar a Comanda -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <a href="{% url 'sistema_restaurante:categorias' %}" 
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-stone-600 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 hover:text-emerald-700 transition-colors shadow-sm">
+                    <span>←</span> Volver a Categorías
+                </a>
 
+                {% if platos_categoria %}
+                <button type="submit" 
+                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-800 hover:bg-emerald-900 hover:shadow-lg transition-all shadow-md">
+                    <span>🛒</span> Agregar seleccionados a la comanda
+                </button>
+                {% endif %}
+            </div>
+
+            {% if platos_categoria %}
+                <div class="space-y-16">
                     <section class="scroll-mt-8">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {% for plato in platos_categoria %}
                                 <article class="bg-white rounded-3xl overflow-hidden border border-stone-200/70 shadow-sm hover:shadow-2xl hover:shadow-emerald-950/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
                                     
-                                    <!-- Dynamic Image Container -->
+                                    <!-- Contenedor de Imagen -->
                                     <div class="relative h-60 w-full bg-stone-100 overflow-hidden">
-                                        
                                         {% if plato.imagen_url %}
                                             <img src="{{ plato.imagen_url }}" 
-                                                 alt="{{ plato.nombre }}" 
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-                                                 loading="lazy"
-                                                 onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                                                alt="{{ plato.nombre }}" 
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                                                loading="lazy"
+                                                onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
                                             
-                                            <!-- Fallback Div if Image Fails to Load -->
                                             <div class="hidden w-full h-full bg-gradient-to-br from-stone-800 to-stone-900 flex flex-col items-center justify-center p-6 text-center">
-                                                <div class="w-14 h-14 rounded-full bg-stone-700/50 flex items-center justify-center text-2xl mb-2 border border-stone-600">
-                                                    🍽️
-                                                </div>
+                                                <div class="w-14 h-14 rounded-full bg-stone-700/50 flex items-center justify-center text-2xl mb-2 border border-stone-600">🍽️</div>
                                                 <span class="text-xs font-serif font-bold text-amber-100 uppercase tracking-wider">El Chato Ranch</span>
                                             </div>
                                         {% else %}
-                                            <!-- Fallback Div if No imagen_url provided -->
                                             <div class="w-full h-full bg-gradient-to-br from-stone-800 to-stone-900 flex flex-col items-center justify-center p-6 text-center">
                                                 <div class="w-14 h-14 rounded-full bg-stone-700/50 flex items-center justify-center text-2xl mb-2 border border-stone-600 overflow-hidden">
-                                                    <img src="{% static "img/logo.jpg"%}" class="w-full h-full object-cover">
+                                                    <img src="{% static 'img/logo.jpg' %}" class="w-full h-full object-cover">
                                                 </div>
                                                 <span class="text-xs font-serif font-bold text-amber-100 uppercase tracking-wider">El Chato Ranch</span>
                                             </div>
                                         {% endif %}
 
-                                        <!-- Badge de Disponibilidad (Glassmorphism Pill) -->
+                                        <!-- Badge de Disponibilidad -->
                                         <div class="absolute top-4 right-4 z-10">
                                             {% if plato.stock_disponible <= 0 %}
                                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-stone-900/85 text-rose-300 border border-rose-500/30 backdrop-blur-md shadow-lg">
-                                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                                                    Agotado
+                                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span> Agotado
                                                 </span>
                                             {% else %}
                                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-stone-900/85 text-emerald-300 border border-emerald-500/30 backdrop-blur-md shadow-lg">
-                                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                                    Disponible
+                                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Disponible
                                                 </span>
                                             {% endif %}
                                         </div>
 
-                                        <!-- Sub-badge de Categoría -->
                                         {% if plato.categoria %}
                                             <div class="absolute bottom-4 left-4 z-10">
                                                 <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-900/75 text-stone-200 border border-stone-700/50 backdrop-blur-md shadow-sm">
@@ -188,10 +212,9 @@
                                                 </span>
                                             </div>
                                         {% endif %}
-
                                     </div>
 
-                                    <!-- Contenido e Información del Platillo -->
+                                    <!-- Información del Platillo -->
                                     <div class="p-6 flex flex-col flex-grow justify-between">
                                         <div>
                                             <h3 class="text-xl font-bold text-stone-900 group-hover:text-emerald-800 transition-colors leading-snug">
@@ -202,51 +225,73 @@
                                             </p>
                                         </div>
 
-                                        <!-- Footer de Tarjeta con Precio y Stock -->
-                                        <div class="mt-6 pt-4 border-t border-stone-100 flex items-center justify-between">
-                                            <div>
-                                                <span class="text-[11px] uppercase tracking-wider text-stone-400 block font-semibold">Precio Unitario</span>
-                                                <span class="text-2xl font-extrabold text-stone-900 tracking-tight">
-                                                    $ {{ plato.precio }}
-                                                </span>
+                                        <!-- Precio, Stock y Selector de Cantidad -->
+                                        <div class="mt-6 pt-4 border-t border-stone-100">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div>
+                                                    <span class="text-[11px] uppercase tracking-wider text-stone-400 block font-semibold">Precio Unitario</span>
+                                                    <span class="text-2xl font-extrabold text-stone-900 tracking-tight">$ {{ plato.precio }}</span>
+                                                </div>
+
+                                                <div class="text-right">
+                                                    {% if plato.stock_disponible > 0 %}
+                                                        <span class="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-3 py-1 rounded-full inline-block">
+                                                            Stock: {{ plato.stock_disponible }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200/60 px-3 py-1 rounded-full inline-block">
+                                                            Sin existencias
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
                                             </div>
 
-                                            <div class="text-right">
-                                                {% if plato.stock_disponible > 0 %}
-                                                    <span class="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-3 py-1 rounded-full inline-block">
-                                                        Stock: {{ plato.stock_disponible }}
-                                                    </span>
-                                                {% else %}
-                                                    <span class="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200/60 px-3 py-1 rounded-full inline-block">
-                                                        Sin existencias
-                                                    </span>
-                                                {% endif %}
+                                            <!-- Selector de Cantidad Dinámico e Individual -->
+                                            <div class="flex items-center justify-between bg-stone-100 p-1.5 rounded-xl border border-stone-200">
+                                                <button type="button" 
+                                                        onclick="modificarNumero('{{ plato.id }}', -1, {{ plato.stock_disponible }})"
+                                                        class="w-9 h-9 rounded-lg bg-white border border-stone-300 text-stone-800 font-bold hover:bg-stone-50 active:scale-95 transition-all flex items-center justify-center shadow-sm disabled:opacity-50"
+                                                        {% if plato.stock_disponible <= 0 %}disabled{% endif %}>
+                                                    -
+                                                </button>
+
+                                                <input type="number" 
+                                                    id="plato_{{ plato.id }}" 
+                                                    name="plato_{{ plato.id }}" 
+                                                    value="0" 
+                                                    min="0" 
+                                                    max="{{ plato.stock_disponible }}"
+                                                    readonly
+                                                    class="w-16 text-center bg-transparent font-extrabold text-stone-800 text-base focus:outline-none select-none">
+
+                                                <button type="button" 
+                                                        onclick="modificarNumero('{{ plato.id }}', 1, {{ plato.stock_disponible }})"
+                                                        class="w-9 h-9 rounded-lg bg-emerald-800 text-white font-bold hover:bg-emerald-900 active:scale-95 transition-all flex items-center justify-center shadow-sm disabled:opacity-50"
+                                                        {% if plato.stock_disponible <= 0 %}disabled{% endif %}>
+                                                    +
+                                                </button>
                                             </div>
+
                                         </div>
-
                                     </div>
 
                                 </article>
                             {% endfor %}
                         </div>
                     </section>
-                
-            </div>
-        {% else %}
-            <!-- State de fallback amigable si no se pueden cargar platillos -->
-            <div class="bg-white border border-stone-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-md my-12">
-                <div class="w-16 h-16 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
-                    🌿
                 </div>
-                <h3 class="text-xl font-serif font-bold text-stone-900">Menú no disponible temporalmente</h3>
-                <p class="mt-2 text-sm text-stone-600 leading-relaxed">
-                    No pudimos obtener la lista de platillos desde nuestro servidor central en este momento. Por favor, intenta actualizar la página.
-                </p>
-                <button onclick="window.location.reload()" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-900 transition-colors shadow-md hover:shadow-lg">
-                    <span>🔄</span> Reintentar Carga
-                </button>
-            </div>
-        {% endif %}
+            {% else %}
+                <!-- Fallback -->
+                <div class="bg-white border border-stone-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-md my-12">
+                    <div class="w-16 h-16 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">🌿</div>
+                    <h3 class="text-xl font-serif font-bold text-stone-900">Menú no disponible temporalmente</h3>
+                    <p class="mt-2 text-sm text-stone-600 leading-relaxed">No pudimos obtener la lista de platillos desde nuestro servidor central en este momento. Por favor, intenta actualizar la página.</p>
+                    <button type="button" onclick="window.location.reload()" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-900 transition-colors shadow-md hover:shadow-lg">
+                        <span>🔄</span> Reintentar Carga
+                    </button>
+                </div>
+            {% endif %}
+        </form>
 
     </main>
 
