@@ -12,5 +12,3 @@ def index(request):
         platos = []
     
     return render(request, 'menu_publico/index.html', {'platos': platos})
-
-

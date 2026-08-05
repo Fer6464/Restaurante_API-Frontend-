@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Chato Ranch | Menú Gastronómico SSR</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            50: '#FDFBF7',
+                            100: '#F7F4EE',
+                            200: '#EBE5DA',
+                            800: '#292524',
+                            900: '#1C1917',
+                        },
+                        ranch: {
+                            green: '#1b4332',
+                            sage: '#40916c',
+                            light: '#d8f3dc',
+                            gold: '#b5838d',
+                            cream: '#fefae0'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col antialiased selection:bg-emerald-900 selection:text-white">
+
+    <!-- Header & Hero Eco-Premium -->
+    <header class="relative bg-stone-900 text-white overflow-hidden shadow-xl border-b border-stone-800">
+        <!-- Subtle Eco-Pattern Overlay Background -->
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#52b788_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 bg-emerald-950/80 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-300 uppercase tracking-widest backdrop-blur-md mb-4 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Reserva Ecológica
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold tracking-tight text-amber-50 leading-tight">
+                        El Chato Ranch <span class="text-emerald-400 font-normal italic">Menú</span>
+                    </h1>
+                    
+                    <p class="mt-4 text-base sm:text-lg text-stone-300 leading-relaxed">
+                        Cultura culinaria sustentable. Ingredientes de nuestra huerta orgánica y carnes seleccionadas preparadas al fuego de leña.
+                    </p>
+
+                    <!-- Quick Navigation Badges -->
+                    <div class="mt-6 flex flex-wrap gap-2 text-xs font-medium text-stone-300">
+                        <span class="bg-stone-800/90 border border-stone-700 px-3 py-1 rounded-lg flex items-center gap-1.5">
+                            🌿 100% Orgánico
+                        </span>
+                        <span class="bg-stone-800/90 border border-stone-700 px-3 py-1 rounded-lg flex items-center gap-1.5">
+                            🔥 Cocción a la Leña
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Decorative Badge / Logo Container -->
+                <div class="hidden md:flex flex-col items-center justify-center p-6 bg-stone-800/60 rounded-3xl border border-stone-700/50 backdrop-blur-md text-center shadow-2xl ">
+                    <div class="w-20 h-20 rounded-2xl bg-emerald-900/60 border border-emerald-500/40 flex items-center justify-center text-4xl shadow-inner mb-3 overflow-hidden">
+                        <img src="{% static "img/logo.jpg"%}" alt="Logo de El Chato Ranch" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs uppercase tracking-widest text-amber-200 font-bold">El Chato Ranch</span>
+                    <span class="text-[10px] text-stone-400 mt-0.5">Est. 2012</span>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+        {% if categorias %}
+            <div class="space-y-16">
+                    <section class="scroll-mt-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {% for categoria in categorias %}
+                                <a href="{% url 'sistema_restaurante:platos_categoria' categoria.id %}">
+                                    <article class="bg-white rounded-3xl overflow-hidden border border-stone-200/70 shadow-sm hover:shadow-2xl hover:shadow-emerald-950/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group"> 
+                                        <!-- Dynamic Image Container -->
+                                        <div class="relative h-60 w-full bg-stone-100 overflow-hidden">
+                                            {% if categoria.url %}
+                                                <img src="{{ categoria.url }}" 
+                                                    alt="{{ categoria.nombre }}" 
+                                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                                                    loading="lazy"
+                                                    onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                                                
+                                                <!-- Fallback Div if Image Fails to Load -->
+                                                <div class="hidden w-full h-full bg-gradient-to-br from-stone-800 to-stone-900 flex flex-col items-center justify-center p-6 text-center">
+                                                    <div class="w-14 h-14 rounded-full bg-stone-700/50 flex items-center justify-center text-2xl mb-2 border border-stone-600">
+                                                        🍽️
+                                                    </div>
+                                                    <span class="text-xs font-serif font-bold text-amber-100 uppercase tracking-wider">El Chato Ranch</span>
+                                                </div>
+                                            {% else %}
+                                                <!-- Fallback Div if No imagen_url provided -->
+                                                <div class="w-full h-full bg-gradient-to-br from-stone-800 to-stone-900 flex flex-col items-center justify-center p-6 text-center">
+                                                    <div class="w-14 h-14 rounded-full bg-stone-700/50 flex items-center justify-center text-2xl mb-2 border border-stone-600 overflow-hidden">
+                                                        <img src="{% static "img/logo.jpg"%}" class="w-full h-full object-cover">
+                                                    </div>
+                                                    <span class="text-xs font-serif font-bold text-amber-100 uppercase tracking-wider">El Chato Ranch</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Nombre de la categoria-->
+                                        <div class="p-6 flex flex-col flex-grow justify-between">
+                                                <h3 class="text-xl font-bold text-stone-900 group-hover:text-emerald-800 transition-colors leading-snug">
+                                                    {{ categoria.nombre }}
+                                                </h3>
+                                        </div>
+                                    </article>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </section>
+                
+            </div>
+        {% else %}
+            <!-- State de fallback amigable si no se pueden cargar platillos -->
+            <div class="bg-white border border-stone-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-md my-12">
+                <div class="w-16 h-16 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                    🌿
+                </div>
+                <h3 class="text-xl font-serif font-bold text-stone-900">Menú no disponible temporalmente</h3>
+                <p class="mt-2 text-sm text-stone-600 leading-relaxed">
+                    No pudimos obtener la lista de platillos desde nuestro servidor central en este momento. Por favor, intenta actualizar la página.
+                </p>
+                <button onclick="window.location.reload()" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-900 transition-colors shadow-md hover:shadow-lg">
+                    <span>🔄</span> Reintentar Carga
+                </button>
+            </div>
+        {% endif %}
+
+    </main>
+
+    <!-- Footer Eco-Premium -->
+    <footer class="bg-stone-900 text-stone-400 py-12 border-t border-stone-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+                <span class="font-serif text-lg font-bold text-amber-100 block">El Chato Ranch</span>
+                <p class="text-xs text-stone-500 mt-1">Reserva Ecológica & Restaurante</p>
+            </div>
+            <p class="text-xs text-stone-500">© 2012 El Chato Ranch. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
+
