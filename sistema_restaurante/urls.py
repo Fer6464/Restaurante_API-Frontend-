@@ -11,6 +11,7 @@ urlpatterns = [
     path('sistema/comandas/', views.comandas_activas, name='comandas_activas'),
     path('sistema/comandas/nueva/', views.crear_comanda, name='crear_comanda'),
     path('sistema/comandas/<int:pedido_id>/', views.comanda_detalle, name='comanda_detalle'),
+    path('sistema/comandas/agregar-platos/', views.agregar_platos_comanda, name='agregar_platos_comanda'),
 ]
 
 
