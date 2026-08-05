@@ -64,3 +64,6 @@ ENV/
 .idea/
 *.swp
 *.swo
+
+
+items/
