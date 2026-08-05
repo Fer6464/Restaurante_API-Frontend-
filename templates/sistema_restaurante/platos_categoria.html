@@ -95,13 +95,21 @@
 
             <!-- Centro (Enlaces) -->
             <div class="flex items-center gap-6 text-sm font-semibold">
-                <a href="{% url 'sistema_restaurante:categorias' %}" class="hover:text-emerald-400 transition-colors">
-                    Categorías
-                </a>
-                <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="hover:text-emerald-400 transition-colors">
-                    Comandas Activas
-                </a>
+                {% if perms.sistema_restaurante.puede_ver_tablero %}
+                    <a href="{% url 'sistema_restaurante:categorias' %}" class="hover:text-emerald-400 transition-colors">
+                        Categorías
+                    </a>
+                    <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="hover:text-emerald-400 transition-colors">
+                        Comandas Activas
+                    </a>
+                {% endif %}
+                {% if perms.sistema_restaurante.puede_crear_comandas %}
+                    <a href="{% url 'sistema_restaurante:crear_comanda' %}" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-amber-950 hover:bg-amber-400 hover:-translate-y-0.5 transition-all shadow-md">
+                        <span>➕</span> Nueva Comanda
+                    </a>
+                {% endif %}
             </div>
+
 
             <!-- Derecha (Cerrar Sesión POST CSRF) -->
             <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
