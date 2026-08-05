@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Chato Ranch | Detalle de Comanda #{{ pedido.id|default:"" }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            50: '#FDFBF7',
+                            100: '#F7F4EE',
+                            200: '#EBE5DA',
+                            800: '#292524',
+                            900: '#1C1917',
+                        },
+                        ranch: {
+                            green: '#1b4332',
+                            sage: '#40916c',
+                            light: '#d8f3dc',
+                            gold: '#b5838d',
+                            cream: '#fefae0'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-100 text-stone-800 min-h-screen flex flex-col antialiased selection:bg-emerald-900 selection:text-white">
+
+    <!-- Header Eco-Premium -->
+    <header class="relative bg-stone-900 text-white overflow-hidden shadow-xl border-b border-stone-800">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#52b788_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-emerald-950/80 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-300 uppercase tracking-widest backdrop-blur-md mb-3 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Gestión en Detalle
+                    </div>
+                    
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold tracking-tight text-amber-50 leading-tight">
+                        Detalle de Comanda <span class="text-emerald-400 font-normal italic">#{{ pedido.id|default:"-" }}</span>
+                    </h1>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Componente Navbar Interno -->
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 w-full">
+        <div class="bg-stone-800 text-stone-200 py-3 px-6 rounded-2xl flex flex-col sm:flex-row justify-between items-center shadow-lg gap-4">
+            <!-- Izquierda (Usuario) -->
+            <div class="text-sm font-medium">
+                👨‍🍳 Operador: <span class="font-bold text-emerald-400">{{ request.user.username|default:"Empleado" }}</span>
+            </div>
+
+            <!-- Centro (Enlaces) -->
+            <div class="flex items-center gap-6 text-sm font-semibold">
+                {% if perms.sistema_restaurante.puede_ver_tablero %}
+                    <a href="{% url 'sistema_restaurante:categorias' %}" class="hover:text-emerald-400 transition-colors">
+                        Categorías
+                    </a>
+                    <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="hover:text-emerald-400 transition-colors">
+                        Comandas Activas
+                    </a>
+                {% endif %}
+                {% if perms.sistema_restaurante.puede_crear_comandas %}
+                    <a href="{% url 'sistema_restaurante:crear_comanda' %}" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-amber-950 hover:bg-amber-400 hover:-translate-y-0.5 transition-all shadow-md">
+                        <span>➕</span> Nueva Comanda
+                    </a>
+                {% endif %}
+            </div>
+
+
+            <!-- Derecha (Cerrar Sesión POST CSRF) -->
+            <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
+                {% csrf_token %}
+                <button type="submit" class="text-rose-400 hover:text-rose-300 font-bold text-sm transition-colors">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- Botón de Retorno UX -->
+        <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="inline-flex items-center gap-2 mb-6 px-4 py-2 text-sm font-semibold text-stone-600 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 hover:text-emerald-700 transition-colors shadow-sm">
+            <span>←</span> Volver a Comandas
+        </a>
+
+        {% if pedido %}
+            <!-- Receipt UI / Ticket de Restaurante -->
+            <article class="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-stone-200 relative overflow-hidden">
+                <!-- Top Receipt Accent Bar -->
+                <div class="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-emerald-800 via-amber-600 to-emerald-900"></div>
+
+                <!-- Cabecera del Ticket -->
+                <div class="border-b border-stone-200 pb-6 mb-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span class="text-xs uppercase font-bold tracking-widest text-stone-400 block">Comanda / Ticket ID</span>
+                            <span class="text-xl font-extrabold text-emerald-800">#{{ pedido.id }}</span>
+                            <h2 class="text-3xl sm:text-4xl font-serif font-extrabold text-stone-900 mt-1 tracking-tight">
+                                {% if pedido.numero_mesa %}
+                                    Mesa {{ pedido.numero_mesa }}
+                                {% else %}
+                                    {{ pedido.nombre_referencia|default:"Sin Nombre" }}
+                                {% endif %}
+                            </h2>
+                            {% if pedido.nombre_referencia and pedido.numero_mesa %}
+                                <span class="text-sm font-semibold text-stone-500 block mt-1">Ref: {{ pedido.nombre_referencia }}</span>
+                            {% endif %}
+                            
+                            <!-- Mesero / Empleado -->
+                            <div class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+                                👨‍🍳 Atendido por: <strong class="font-bold">{{ pedido.empleado.nombre|default:"Mesero" }}</strong>
+                            </div>
+                        </div>
+
+                        <!-- Badge de Estado -->
+                        <div class="text-right">
+                            {% if pedido.estado_comanda == "En preparación" or pedido.estado_comanda == "preparando" %}
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-sm">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+                                    {{ pedido.estado_comanda }}
+                                </span>
+                            {% elif pedido.estado_comanda == "Pendiente" or pedido.estado_comanda == "pendiente" %}
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-300 shadow-sm">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                    {{ pedido.estado_comanda }}
+                                </span>
+                            {% elif pedido.estado_comanda == "Listo" or pedido.estado_comanda == "listo" %}
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    {{ pedido.estado_comanda }}
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-stone-200 text-stone-800 border border-stone-300 shadow-sm">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-stone-500"></span>
+                                    {{ pedido.estado_comanda|default:"Activo" }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cuerpo del Ticket: Tabla/Lista de Platos -->
+                <div class="mb-8">
+                    <h3 class="text-xs uppercase tracking-widest font-extrabold text-stone-400 mb-4">Detalle de la Orden</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-stone-200 text-[11px] uppercase font-bold text-stone-500">
+                                    <th class="py-2.5 px-2">Cant.</th>
+                                    <th class="py-2.5 px-2">Plato</th>
+                                    <th class="py-2.5 px-2 text-right">Notas Específicas</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-stone-100">
+                                {% for item in pedido.detalle_pedido %}
+                                    <tr class="hover:bg-stone-50/80 transition-colors">
+
+                                        <td class="py-3 px-2 font-extrabold text-stone-900 align-top">
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-900 text-amber-100 text-xs">
+                                                {{ item.cantidad|default:1 }}x
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-2 align-top">
+                                            <span class="font-bold text-stone-800 text-base block">
+                                                {% if item.item_menu.nombre %}
+                                                    {{ item.item_menu.nombre }}
+                                                {% else %}
+                                                    Plato #{{ item.item_menu_id }}
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-2 text-right align-top">
+                                            {% if item.notas_especificas %}
+                                                <span class="text-xs italic text-stone-500 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-lg inline-block">
+                                                    📌 {{ item.notas_especificas }}
+                                                </span>
+                                            {% elif item.notas %}
+                                                <span class="text-xs italic text-stone-500 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-lg inline-block">
+                                                    📌 {{ item.notas }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-xs text-stone-400 italic">Sin notas</span>
+                                            {% endif %}
+                                        </td>
+
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="py-4 text-center text-sm text-stone-400 italic">No hay ítems registrados en este pedido.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pie del Ticket -->
+                <div class="bg-stone-50 -mx-8 -mb-8 p-6 border-t border-stone-200 flex flex-wrap items-center justify-between gap-4 text-xs text-stone-600 font-medium">
+                    <div class="flex items-center gap-4">
+                        <span>Origen: <strong class="text-stone-900 uppercase tracking-wide">{{ pedido.origen_pedido|default:"web" }}</strong></span>
+                        {% if pedido.emisor_id %}
+                            <span>Emisor ID: <strong class="text-stone-900">{{ pedido.emisor_id }}</strong></span>
+                        {% endif %}
+                    </div>
+                    {% if pedido.prioridad %}
+                        <div class="flex items-center gap-1.5">
+                            <span>Prioridad:</span>
+                            <span class="font-extrabold text-amber-900 bg-amber-200/80 border border-amber-300 px-3 py-0.5 rounded-full uppercase text-[11px]">
+                                {{ pedido.prioridad }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </article>
+
+        {% else %}
+            <!-- Fallback si la API no encuentra la comanda -->
+            <div class="bg-white border border-stone-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-md my-12">
+                <div class="w-16 h-16 bg-rose-100 text-rose-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                    ❌
+                </div>
+                <h3 class="text-xl font-serif font-bold text-stone-900">No se pudo cargar la comanda</h3>
+                <p class="mt-2 text-sm text-stone-600 leading-relaxed">
+                    El identificador de pedido solicitado no existe o no responde en el servidor central.
+                </p>
+                <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-900 transition-colors shadow-md hover:shadow-lg">
+                    <span>←</span> Regresar a Comandas
+                </a>
+            </div>
+        {% endif %}
+
+    </main>
+
+    <!-- Footer Eco-Premium -->
+    <footer class="bg-stone-900 text-stone-400 py-8 border-t border-stone-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <span class="font-serif text-base font-bold text-amber-100 block">El Chato Ranch</span>
+                <p class="text-xs text-stone-500 mt-0.5">Sistema de Gestión de Comandas y Cocina en Vivo</p>
+            </div>
+            <p class="text-xs text-stone-500">© 2012 El Chato Ranch. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

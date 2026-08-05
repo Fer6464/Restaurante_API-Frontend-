@@ -127,3 +127,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Authentication redirect settings
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/restaurante/sistema/categorias'
+LOGOUT_REDIRECT_URL = '/login/'
+
