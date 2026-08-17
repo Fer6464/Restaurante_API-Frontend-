@@ -12,6 +12,9 @@ urlpatterns = [
     path('sistema/comandas/nueva/', views.crear_comanda, name='crear_comanda'),
     path('sistema/comandas/<int:pedido_id>/', views.comanda_detalle, name='comanda_detalle'),
     path('sistema/comandas/agregar-platos/', views.agregar_platos_comanda, name='agregar_platos_comanda'),
+    path('sistema/comandas/borrador/', views.ver_borrador, name='ver_borrador'),
+    path('sistema/comandas/agregar/', views.agregar_comanda, name='agregar_comanda'),
+    path('sistema/comandas/cancelar/', views.cancelar_comanda, name='cancelar_comanda'),
 ]
 
 
