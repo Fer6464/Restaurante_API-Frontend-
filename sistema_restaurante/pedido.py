@@ -18,28 +18,46 @@ class PedidoBorrador:
             }
         self.pedido = pedido
 
-    def agregar_detalle(self, item_menu_id, cantidad=1, notas=""):
+    def obtener_cantidad_item(self, item_menu_id):
+        """Devuelve la cantidad actual de un plato específico en el borrador"""
+        item_menu_id = int(item_menu_id)
+        detalle = next((d for d in self.pedido['detalles'] if d['item_menu_id'] == item_menu_id), None)
+        return detalle['cantidad'] if detalle else 0
+
+    def agregar_detalle(self, item_menu_id, cantidad=1, notas="", stock_maximo=None, nombre=""):
         item_menu_id = int(item_menu_id)
         cantidad = int(cantidad)
 
-        # Buscar si el plato/item ya existe en los detalles
         detalle_existente = next(
             (d for d in self.pedido['detalles'] if d['item_menu_id'] == item_menu_id), 
             None
         )
 
+        cantidad_actual = detalle_existente['cantidad'] if detalle_existente else 0
+        nueva_cantidad = cantidad_actual + cantidad
+
+        if stock_maximo is not None and nueva_cantidad > stock_maximo:
+            nueva_cantidad = stock_maximo
+            cantidad = stock_maximo - cantidad_actual
+            if cantidad <= 0:
+                return False
+
         if detalle_existente:
-            detalle_existente['cantidad'] += cantidad
+            detalle_existente['cantidad'] = nueva_cantidad
             if notas:
                 detalle_existente['notas'] = notas
+            if nombre:
+                detalle_existente['nombre'] = nombre
         else:
             self.pedido['detalles'].append({
                 "item_menu_id": item_menu_id,
-                "cantidad": cantidad,
+                "nombre": nombre,
+                "cantidad": nueva_cantidad,
                 "notas": notas
             })
 
         self.guardar()
+        return True
 
     def actualizar_cabecera(self, mesa=None, nombre_ref=None, prioridad=None, origen=None):
         if mesa is not None:

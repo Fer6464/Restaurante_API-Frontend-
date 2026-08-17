@@ -113,21 +113,8 @@
             </div>
 
             <!-- Centro (Enlaces) -->
-            <div class="flex items-center gap-6 text-sm font-semibold">
-                {% if perms.sistema_restaurante.puede_ver_tablero %}
-                    <a href="{% url 'sistema_restaurante:categorias' %}" class="hover:text-emerald-400 transition-colors">
-                        Categorías
-                    </a>
-                    <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="hover:text-emerald-400 transition-colors">
-                        Comandas Activas
-                    </a>
-                {% endif %}
-                {% if perms.sistema_restaurante.puede_crear_comandas %}
-                    <a href="{% url 'sistema_restaurante:crear_comanda' %}" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-amber-950 hover:bg-amber-400 hover:-translate-y-0.5 transition-all shadow-md">
-                        <span>➕</span> Nueva Comanda
-                    </a>
-                {% endif %}
-            </div>
+            {% include './partials/nav_links.html' %}
+
 
 
             <!-- Derecha (Cerrar Sesión POST CSRF) -->
@@ -169,7 +156,10 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {% for plato in platos_categoria %}
                                 <article class="bg-white rounded-3xl overflow-hidden border border-stone-200/70 shadow-sm hover:shadow-2xl hover:shadow-emerald-950/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
-                                    
+    
+                                    <!-- Input Oculto con el Nombre del Plato -->
+                                    <input type="hidden" name="nombre_{{ plato.id }}" value="{{ plato.nombre }}">
+
                                     <!-- Contenedor de Imagen -->
                                     <div class="relative h-60 w-full bg-stone-100 overflow-hidden">
                                         {% if plato.imagen_url %}

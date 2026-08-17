@@ -1,0 +1,12 @@
+<div class="flex items-center gap-6 text-sm font-semibold">
+    {% if perms.sistema_restaurante.puede_ver_tablero %}
+        <a href="{% url 'sistema_restaurante:comandas_activas' %}" class="hover:text-emerald-400 transition-colors">
+            Comandas Activas
+        </a>
+    {% endif %}
+    {% if perms.sistema_restaurante.puede_crear_comandas %}
+        <a href="{% url 'sistema_restaurante:categorias' %}" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-amber-950 hover:bg-amber-400 hover:-translate-y-0.5 transition-all shadow-md">
+            <span>➕</span> Nueva Comanda
+        </a>
+    {% endif %}
+</div>
